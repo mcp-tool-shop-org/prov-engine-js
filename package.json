@@ -1,0 +1,24 @@
+{
+  "name": "prov-engine-js",
+  "version": "0.1.0",
+  "description": "Minimal Node.js provenance engine for prov-spec interop",
+  "type": "module",
+  "main": "prov-engine.js",
+  "bin": {
+    "prov-engine": "./prov-engine.js"
+  },
+  "scripts": {
+    "test": "node prov-engine.js check-vector ../prov-spec/spec/vectors/integrity.digest.sha256 && node prov-engine.js check-vector ../prov-spec/spec/vectors/adapter.wrap.envelope_v0_1"
+  },
+  "keywords": [
+    "provenance",
+    "prov-spec",
+    "sha256",
+    "canonical-json"
+  ],
+  "author": "prov-spec",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
