@@ -14,10 +14,22 @@
     "provenance",
     "prov-spec",
     "sha256",
-    "canonical-json"
+    "canonical-json",
+    "integrity",
+    "interop",
+    "conformance",
+    "zero-dependency"
   ],
-  "author": "prov-spec",
+  "author": "mcp-tool-shop <64996768+mcp-tool-shop@users.noreply.github.com>",
   "license": "MIT",
+  "homepage": "https://github.com/mcp-tool-shop/prov-engine-js#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mcp-tool-shop/prov-engine-js.git"
+  },
+  "bugs": {
+    "url": "https://github.com/mcp-tool-shop/prov-engine-js/issues"
+  },
   "engines": {
     "node": ">=18.0.0"
   }
