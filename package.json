@@ -1,5 +1,5 @@
 {
-  "name": "@mcp-tool-shop/prov-engine-js",
+  "name": "@mcptoolshop/prov-engine-js",
   "version": "0.2.0",
   "description": "Minimal Node.js provenance engine for prov-spec interop",
   "type": "module",
