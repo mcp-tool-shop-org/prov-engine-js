@@ -6,11 +6,12 @@
 
 **A minimal, zero-dependency Node.js provenance engine implementing the prov-spec standard.**
 
+[![CI](https://github.com/mcp-tool-shop-org/prov-engine-js/actions/workflows/ci.yml/badge.svg)](https://github.com/mcp-tool-shop-org/prov-engine-js/actions/workflows/ci.yml)
 [![npm version](https://img.shields.io/npm/v/@mcptoolshop/prov-engine-js)](https://www.npmjs.com/package/@mcptoolshop/prov-engine-js)
 [![license](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![zero dependencies](https://img.shields.io/badge/dependencies-0-brightgreen)]()
 [![node](https://img.shields.io/badge/node-18%2B-blue)]()
-[![prov-spec L1](https://img.shields.io/badge/prov--spec-L1%20Integrity-blue)](https://github.com/prov-spec/prov-spec)
+[![prov-spec L1](https://img.shields.io/badge/prov--spec-L1%20Integrity-blue)](https://github.com/mcp-tool-shop-org/prov-spec)
 
 ---
 
@@ -61,7 +62,7 @@ npx @mcptoolshop/prov-engine-js describe
     "name": "prov-engine-js",
     "version": "0.1.0",
     "vendor": "prov-spec",
-    "repo": "https://github.com/prov-spec/prov-engine-js",
+    "repo": "https://github.com/mcp-tool-shop-org/prov-engine-js",
     "license": "MIT"
   },
   "implements": [

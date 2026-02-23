@@ -141,7 +141,7 @@ function cmdDescribe() {
       name: "prov-engine-js",
       version: VERSION,
       vendor: "prov-spec",
-      repo: "https://github.com/prov-spec/prov-engine-js",
+      repo: "https://github.com/mcp-tool-shop-org/prov-engine-js",
       license: "MIT",
     },
     implements: [
