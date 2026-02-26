@@ -13,21 +13,21 @@
   <a href="https://mcp-tool-shop-org.github.io/prov-engine-js/"><img src="https://img.shields.io/badge/Landing_Page-live-blue" alt="Landing Page"></a>
 </p>
 
-**A minimal, zero-dependency Node.js provenance engine implementing the prov-spec standard.**
+**Un motore di provenienza Node.js minimalista, senza dipendenze, che implementa lo standard prov-spec.**
 
 ---
 
-## At a Glance
+## Panoramica
 
-- **Zero dependencies** -- uses only Node.js built-ins (`node:fs`, `node:crypto`, `node:process`)
-- **Single-file engine** -- the entire implementation lives in `prov-engine.js`
-- **CLI + programmatic** -- run from the command line or import into your own code
-- **prov-spec L1 conformant** -- passes all Level 1 (Integrity) test vectors
-- **JCS-subset canonicalization** -- deterministic JSON serialization per prov-spec Section 6
+- **Nessuna dipendenza** -- utilizza solo i moduli integrati di Node.js (`node:fs`, `node:crypto`, `node:process`)
+- **Motore in un unico file** -- l'intera implementazione è contenuta in `prov-engine.js`
+- **CLI + programmazione** -- può essere eseguito dalla riga di comando o importato nel proprio codice
+- **Conforme a prov-spec L1** -- supera tutti i vettori di test di Livello 1 (Integrità)
+- **Canonicalizzazione JCS-subset** -- serializzazione JSON deterministica secondo la sezione 6 dello standard prov-spec
 
 ---
 
-## Install
+## Installazione
 
 ```bash
 # Add to your project
@@ -37,7 +37,7 @@ pnpm add @mcptoolshop/prov-engine-js
 npx @mcptoolshop/prov-engine-js describe
 ```
 
-You can also clone the repo and run the engine directly:
+È possibile clonare il repository ed eseguire il motore direttamente:
 
 ```bash
 git clone https://github.com/mcp-tool-shop-org/prov-engine-js.git
@@ -47,11 +47,11 @@ node prov-engine.js describe
 
 ---
 
-## CLI Commands
+## Comandi CLI
 
-The engine exposes five commands. All output is JSON written to stdout.
+Il motore espone cinque comandi. Tutto l'output è in formato JSON e viene scritto su stdout.
 
-### `describe` -- Print capability manifest
+### `describe` -- Stampa il manifest delle funzionalità
 
 ```bash
 npx @mcptoolshop/prov-engine-js describe
@@ -75,7 +75,7 @@ npx @mcptoolshop/prov-engine-js describe
 }
 ```
 
-### `digest <input.json>` -- Compute canonical form and SHA-256 digest
+### `digest <input.json>` -- Calcola la forma canonica e l'hash SHA-256
 
 ```bash
 echo '{"b":2,"a":1}' > input.json
@@ -92,7 +92,7 @@ npx @mcptoolshop/prov-engine-js digest input.json
 }
 ```
 
-### `wrap <payload.json>` -- Wrap payload in an MCP envelope
+### `wrap <payload.json>` -- Incapsula il payload in una busta MCP
 
 ```bash
 echo '{"tool":"example","result":"ok"}' > payload.json
@@ -109,11 +109,11 @@ npx @mcptoolshop/prov-engine-js wrap payload.json
 }
 ```
 
-If the input is already an envelope (`schema_version` equals `mcp.envelope.v0.1`), it is passed through unchanged (no double-wrapping).
+Se l'input è già una busta (`schema_version` è uguale a `mcp.envelope.v0.1`), viene passato invariato (senza doppia incapsulazione).
 
-### `verify-digest <artifact.json>` -- Verify a digest claim
+### `verify-digest <artifact.json>` -- Verifica una dichiarazione di hash
 
-The input file must contain a `content` field and a `digest` field with `alg` and `value`:
+Il file di input deve contenere un campo `content` e un campo `digest` con i campi `alg` e `value`:
 
 ```bash
 cat > artifact.json << 'EOF'
@@ -130,7 +130,7 @@ npx @mcptoolshop/prov-engine-js verify-digest artifact.json
 echo $?  # 0
 ```
 
-### `check-vector <vector-dir>` -- Run a prov-spec test vector
+### `check-vector <vector-dir>` -- Esegue un vettore di test prov-spec
 
 ```bash
 npx @mcptoolshop/prov-engine-js check-vector ../prov-spec/spec/vectors/integrity.digest.sha256
@@ -140,13 +140,13 @@ npx @mcptoolshop/prov-engine-js check-vector ../prov-spec/spec/vectors/adapter.w
 # PASS: adapter.wrap.envelope_v0_1 vector
 ```
 
-The vector directory must contain `input.json` and `expected.json`. The engine auto-detects the vector type from the expected output shape.
+La directory del vettore deve contenere `input.json` e `expected.json`. Il motore rileva automaticamente il tipo di vettore in base alla forma dell'output previsto.
 
 ---
 
-## Programmatic Usage
+## Utilizzo programmatico
 
-The engine is an ES module. You can import its internals for use in your own code:
+Il motore è un modulo ES. È possibile importare i suoi componenti interni per utilizzarli nel proprio codice:
 
 ```js
 import { createHash } from "node:crypto";
@@ -185,56 +185,56 @@ const envelope = {
 console.log("Envelope: ", JSON.stringify(envelope, null, 2));
 ```
 
-> **Tip:** A future release will export `canonicalize`, `computeDigest`, and `wrapEnvelope` as named exports so you can `import { canonicalize } from "@mcptoolshop/prov-engine-js"` directly.
+> **Suggerimento:** In una versione futura, `canonicalize`, `computeDigest` e `wrapEnvelope` saranno esportati come esportazioni denominate, in modo da poter importare direttamente `canonicalize` da "@mcptoolshop/prov-engine-js".
 
 ---
 
-## Methods
+## Metodi
 
-| Method | Description |
-|--------|-------------|
-| `integrity.digest.sha256` | Canonicalize JSON per prov-spec Section 6, then compute SHA-256 over the UTF-8 bytes. Returns `{ alg: "sha256", value: "<hex>" }`. |
-| `adapter.wrap.envelope_v0_1` | Wrap any JSON payload in `{ schema_version: "mcp.envelope.v0.1", result: <payload> }`. Already-wrapped envelopes pass through unchanged. |
-
----
-
-## How Canonicalization Works
-
-prov-spec requires deterministic JSON serialization so that the same logical object always produces the same byte sequence (and therefore the same digest). This engine implements a JCS-subset canonicalization per prov-spec Section 6:
-
-1. **Sorted keys** -- Object keys are sorted lexicographically by Unicode code point order.
-2. **No whitespace** -- No spaces or newlines between tokens. Separators are `,` and `:` only.
-3. **Number normalization** -- No leading zeros, no trailing zeros after decimal point, no positive sign, `-0` becomes `0`.
-4. **Minimal string escaping** -- Only required escape sequences are emitted.
-5. **UTF-8 encoding** -- The canonical string is encoded as UTF-8 before hashing.
-
-Example: `{"b": 2, "a": 1}` canonicalizes to `{"a":1,"b":2}`.
+| Metodo | Descrizione |
+| -------- | ------------- |
+| `integrity.digest.sha256` | Canonicalizza il JSON secondo la sezione 6 dello standard prov-spec, quindi calcola l'hash SHA-256 sui byte UTF-8. Restituisce `{ alg: "sha256", value: "<hex>" }`. |
+| `adapter.wrap.envelope_v0_1` | Incapsula qualsiasi payload JSON in `{ schema_version: "mcp.envelope.v0.1", result: <payload> }`. Le buste già incapsulate vengono passate invariate. |
 
 ---
 
-## Conformance
+## Come funziona la canonicalizzazione
 
-This engine declares **fully-conformant** status for **Level 1 (Integrity)** of the prov-spec standard.
+Lo standard prov-spec richiede una serializzazione JSON deterministica in modo che lo stesso oggetto logico produca sempre la stessa sequenza di byte (e quindi lo stesso hash). Questo motore implementa una canonicalizzazione JCS-subset secondo la sezione 6 dello standard prov-spec:
 
-- Passes all `integrity.digest.sha256` test vectors
-- Passes all `adapter.wrap.envelope_v0_1` test vectors
-- Zero known deviations
+1. **Chiavi ordinate** -- Le chiavi degli oggetti vengono ordinate lessicograficamente in base all'ordine del codice Unicode.
+2. **Nessuno spazio bianco** -- Nessuno spazio o nuova riga tra i token. I separatori sono solo `,` e `:`.
+3. **Normalizzazione dei numeri** -- Nessun zero iniziale, nessun zero finale dopo il punto decimale, nessun segno positivo, `-0` diventa `0`.
+4. **Escape minimo delle stringhe** -- Vengono emesse solo le sequenze di escape richieste.
+5. **Codifica UTF-8** -- La stringa canonica viene codificata come UTF-8 prima dell'hashing.
 
-See `prov-capabilities.json` for the full capability manifest.
-
----
-
-## Docs
-
-| Document | Description |
-|----------|-------------|
-| [HANDBOOK.md](HANDBOOK.md) | Deep-dive guide: provenance concepts, prov-spec mechanics, integration patterns, architecture, FAQ |
-| [CONTRIBUTING.md](CONTRIBUTING.md) | How to contribute, development workflow, design principles |
-| [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) | Community standards |
-| [CHANGELOG.md](CHANGELOG.md) | Release history (Keep a Changelog format) |
+Esempio: `{"b": 2, "a": 1}` viene canonizzato in `{"a":1,"b":2}`.
 
 ---
 
-## License
+## Conformità
+
+Questo motore dichiara uno stato di **conformità completa** per il **Livello 1 (Integrità)** dello standard prov-spec.
+
+- Supera tutti i vettori di test `integrity.digest.sha256`
+- Supera tutti i vettori di test `adapter.wrap.envelope_v0_1`
+- Nessuna deviazione nota
+
+Consultare `prov-capabilities.json` per il manifest completo delle funzionalità.
+
+---
+
+## Documentazione
+
+| Documento | Descrizione |
+| ---------- | ------------- |
+| [HANDBOOK.md](HANDBOOK.md) | Guida approfondita: concetti di provenienza, meccanismi prov-spec, modelli di integrazione, architettura, FAQ |
+| [CONTRIBUTING.md](CONTRIBUTING.md) | Come contribuire, flusso di lavoro di sviluppo, principi di progettazione. |
+| [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) | Standard della comunità. |
+| [CHANGELOG.md](CHANGELOG.md) | Cronologia delle versioni (in formato Changelog). |
+
+---
+
+## Licenza
 
 [MIT](LICENSE)

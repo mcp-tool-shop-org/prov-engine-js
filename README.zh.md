@@ -13,21 +13,21 @@
   <a href="https://mcp-tool-shop-org.github.io/prov-engine-js/"><img src="https://img.shields.io/badge/Landing_Page-live-blue" alt="Landing Page"></a>
 </p>
 
-**A minimal, zero-dependency Node.js provenance engine implementing the prov-spec standard.**
+**一个实现 prov-spec 标准的、轻量级、无依赖的 Node.js 溯源引擎。**
 
 ---
 
-## At a Glance
+## 概述
 
-- **Zero dependencies** -- uses only Node.js built-ins (`node:fs`, `node:crypto`, `node:process`)
-- **Single-file engine** -- the entire implementation lives in `prov-engine.js`
-- **CLI + programmatic** -- run from the command line or import into your own code
-- **prov-spec L1 conformant** -- passes all Level 1 (Integrity) test vectors
-- **JCS-subset canonicalization** -- deterministic JSON serialization per prov-spec Section 6
+- **无依赖**：仅使用 Node.js 内置模块 (`node:fs`, `node:crypto`, `node:process`)
+- **单文件引擎**：整个实现都包含在 `prov-engine.js` 文件中
+- **命令行 + 编程接口**：可以通过命令行运行，也可以导入到您自己的代码中
+- **符合 prov-spec L1 标准**：通过所有 Level 1 (完整性) 的测试用例
+- **JCS 子集规范化**：按照 prov-spec 第 6 节，进行确定性的 JSON 序列化
 
 ---
 
-## Install
+## 安装
 
 ```bash
 # Add to your project
@@ -37,7 +37,7 @@ pnpm add @mcptoolshop/prov-engine-js
 npx @mcptoolshop/prov-engine-js describe
 ```
 
-You can also clone the repo and run the engine directly:
+您也可以克隆代码仓库，并直接运行引擎：
 
 ```bash
 git clone https://github.com/mcp-tool-shop-org/prov-engine-js.git
@@ -47,11 +47,11 @@ node prov-engine.js describe
 
 ---
 
-## CLI Commands
+## 命令行命令
 
-The engine exposes five commands. All output is JSON written to stdout.
+该引擎提供了五个命令。所有输出都以 JSON 格式写入到标准输出。
 
-### `describe` -- Print capability manifest
+### `describe` -- 打印能力清单
 
 ```bash
 npx @mcptoolshop/prov-engine-js describe
@@ -75,7 +75,7 @@ npx @mcptoolshop/prov-engine-js describe
 }
 ```
 
-### `digest <input.json>` -- Compute canonical form and SHA-256 digest
+### `digest <input.json>` -- 计算规范化形式和 SHA-256 摘要
 
 ```bash
 echo '{"b":2,"a":1}' > input.json
@@ -92,7 +92,7 @@ npx @mcptoolshop/prov-engine-js digest input.json
 }
 ```
 
-### `wrap <payload.json>` -- Wrap payload in an MCP envelope
+### `wrap <payload.json>` -- 将有效负载封装在 MCP 报文中
 
 ```bash
 echo '{"tool":"example","result":"ok"}' > payload.json
@@ -109,11 +109,11 @@ npx @mcptoolshop/prov-engine-js wrap payload.json
 }
 ```
 
-If the input is already an envelope (`schema_version` equals `mcp.envelope.v0.1`), it is passed through unchanged (no double-wrapping).
+如果输入已经是报文（`schema_version` 等于 `mcp.envelope.v0.1`），则将其原样通过（不进行双重封装）。
 
-### `verify-digest <artifact.json>` -- Verify a digest claim
+### `verify-digest <artifact.json>` -- 验证摘要
 
-The input file must contain a `content` field and a `digest` field with `alg` and `value`:
+输入文件必须包含 `content` 字段和一个 `digest` 字段，其中包含 `alg` 和 `value`：
 
 ```bash
 cat > artifact.json << 'EOF'
@@ -130,7 +130,7 @@ npx @mcptoolshop/prov-engine-js verify-digest artifact.json
 echo $?  # 0
 ```
 
-### `check-vector <vector-dir>` -- Run a prov-spec test vector
+### `check-vector <vector-dir>` -- 运行 prov-spec 测试用例
 
 ```bash
 npx @mcptoolshop/prov-engine-js check-vector ../prov-spec/spec/vectors/integrity.digest.sha256
@@ -140,13 +140,13 @@ npx @mcptoolshop/prov-engine-js check-vector ../prov-spec/spec/vectors/adapter.w
 # PASS: adapter.wrap.envelope_v0_1 vector
 ```
 
-The vector directory must contain `input.json` and `expected.json`. The engine auto-detects the vector type from the expected output shape.
+向量目录必须包含 `input.json` 和 `expected.json`。引擎会自动检测向量类型，基于预期的输出结构。
 
 ---
 
-## Programmatic Usage
+## 编程使用
 
-The engine is an ES module. You can import its internals for use in your own code:
+该引擎是一个 ES 模块。您可以导入其内部模块，并在您自己的代码中使用：
 
 ```js
 import { createHash } from "node:crypto";
@@ -185,56 +185,56 @@ const envelope = {
 console.log("Envelope: ", JSON.stringify(envelope, null, 2));
 ```
 
-> **Tip:** A future release will export `canonicalize`, `computeDigest`, and `wrapEnvelope` as named exports so you can `import { canonicalize } from "@mcptoolshop/prov-engine-js"` directly.
+> **提示：** 在未来的版本中，`canonicalize`、`computeDigest` 和 `wrapEnvelope` 将作为命名导出，以便您可以直接 `import { canonicalize } from "@mcptoolshop/prov-engine-js"`。
 
 ---
 
-## Methods
+## 方法
 
-| Method | Description |
-|--------|-------------|
-| `integrity.digest.sha256` | Canonicalize JSON per prov-spec Section 6, then compute SHA-256 over the UTF-8 bytes. Returns `{ alg: "sha256", value: "<hex>" }`. |
-| `adapter.wrap.envelope_v0_1` | Wrap any JSON payload in `{ schema_version: "mcp.envelope.v0.1", result: <payload> }`. Already-wrapped envelopes pass through unchanged. |
-
----
-
-## How Canonicalization Works
-
-prov-spec requires deterministic JSON serialization so that the same logical object always produces the same byte sequence (and therefore the same digest). This engine implements a JCS-subset canonicalization per prov-spec Section 6:
-
-1. **Sorted keys** -- Object keys are sorted lexicographically by Unicode code point order.
-2. **No whitespace** -- No spaces or newlines between tokens. Separators are `,` and `:` only.
-3. **Number normalization** -- No leading zeros, no trailing zeros after decimal point, no positive sign, `-0` becomes `0`.
-4. **Minimal string escaping** -- Only required escape sequences are emitted.
-5. **UTF-8 encoding** -- The canonical string is encoded as UTF-8 before hashing.
-
-Example: `{"b": 2, "a": 1}` canonicalizes to `{"a":1,"b":2}`.
+| 方法 | 描述 |
+| -------- | ------------- |
+| `integrity.digest.sha256` | 按照 prov-spec 第 6 节进行 JSON 规范化，然后计算 UTF-8 字节的 SHA-256 摘要。返回 `{ alg: "sha256", value: "<hex>" }`。 |
+| `adapter.wrap.envelope_v0_1` | 将任何 JSON 有效负载封装在 `{ schema_version: "mcp.envelope.v0.1", result: <payload> }` 中。已经封装的报文将原样通过。 |
 
 ---
 
-## Conformance
+## 规范化的工作原理
 
-This engine declares **fully-conformant** status for **Level 1 (Integrity)** of the prov-spec standard.
+prov-spec 要求进行确定性的 JSON 序列化，以便相同的逻辑对象始终产生相同的字节序列（因此产生相同的摘要）。该引擎实现了 JCS 子集规范化，具体参见 prov-spec 第 6 节：
 
-- Passes all `integrity.digest.sha256` test vectors
-- Passes all `adapter.wrap.envelope_v0_1` test vectors
-- Zero known deviations
+1. **排序的键**：对象键按 Unicode 代码点顺序进行词法排序。
+2. **无空格**：在令牌之间没有空格或换行符。分隔符仅为 `,` 和 `:`。
+3. **数字规范化**：没有前导零，没有小数点后的尾随零，没有正号，`-0` 变为 `0`。
+4. **最小的转义**：仅输出必需的转义序列。
+5. **UTF-8 编码**：在哈希之前，将规范字符串编码为 UTF-8。
 
-See `prov-capabilities.json` for the full capability manifest.
-
----
-
-## Docs
-
-| Document | Description |
-|----------|-------------|
-| [HANDBOOK.md](HANDBOOK.md) | Deep-dive guide: provenance concepts, prov-spec mechanics, integration patterns, architecture, FAQ |
-| [CONTRIBUTING.md](CONTRIBUTING.md) | How to contribute, development workflow, design principles |
-| [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) | Community standards |
-| [CHANGELOG.md](CHANGELOG.md) | Release history (Keep a Changelog format) |
+示例：`{"b": 2, "a": 1}` 规范化为 `{"a":1,"b":2}`。
 
 ---
 
-## License
+## 兼容性
+
+该引擎声明对 prov-spec 标准的 **Level 1 (完整性)** 具有 **完全兼容** 的状态。
+
+- 通过所有 `integrity.digest.sha256` 测试用例
+- 通过所有 `adapter.wrap.envelope_v0_1` 测试用例
+- 没有已知的偏差
+
+请参阅 `prov-capabilities.json` 以获取完整的兼容性清单。
+
+---
+
+## 文档
+
+| 文档 | 描述 |
+| ---------- | ------------- |
+| [HANDBOOK.md](HANDBOOK.md) | 深入指南：溯源概念、prov-spec 机制、集成模式、架构、常见问题解答 |
+| [CONTRIBUTING.md](CONTRIBUTING.md) | 如何参与、开发流程、设计原则 |
+| [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) | 社区规范 |
+| [CHANGELOG.md](CHANGELOG.md) | 版本发布历史（采用 Changelog 格式） |
+
+---
+
+## 许可证
 
 [MIT](LICENSE)
