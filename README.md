@@ -235,6 +235,33 @@ See `prov-capabilities.json` for the full capability manifest.
 
 ---
 
+## Security & Data Scope
+
+| Aspect | Detail |
+|--------|--------|
+| **Data touched** | JSON files read from disk for digest computation and envelope wrapping. SHA-256 hashes computed in-memory |
+| **Data NOT touched** | No telemetry. No analytics. No credential storage. No network calls. No state persistence |
+| **Permissions** | Read: JSON files specified as CLI arguments. Write: stdout only |
+| **Network** | None — fully offline, zero-dependency (Node.js built-ins only) |
+| **Telemetry** | None collected or sent |
+
+See [SECURITY.md](SECURITY.md) for vulnerability reporting.
+
+## Scorecard
+
+| Category | Score |
+|----------|-------|
+| A. Security | 10 |
+| B. Error Handling | 10 |
+| C. Operator Docs | 10 |
+| D. Shipping Hygiene | 10 |
+| E. Identity (soft) | 10 |
+| **Overall** | **50/50** |
+
+> Full audit: [SHIP_GATE.md](SHIP_GATE.md) · [SCORECARD.md](SCORECARD.md)
+
+---
+
 ## License
 
 [MIT](LICENSE)
